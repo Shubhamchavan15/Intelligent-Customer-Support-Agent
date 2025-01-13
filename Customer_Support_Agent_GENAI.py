@@ -6,6 +6,7 @@ from langchain_core.runnables.graph import MermaidDrawMethod
 from dotenv import load_dotenv
 import os
 from langchain_groq import ChatGroq
+import config
 
 # Load environment variables
 load_dotenv()
@@ -13,7 +14,7 @@ load_dotenv()
 # Explicitly set API key in case it's not loaded properly
 api_key = os.getenv('GROQ_API_KEY')
 if not api_key:
-    os.environ['GROQ_API_KEY'] = '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'
+    os.environ['GROQ_API_KEY'] = config.GROQ_API_KEY
 
 llm = ChatGroq(
     temperature=0,
