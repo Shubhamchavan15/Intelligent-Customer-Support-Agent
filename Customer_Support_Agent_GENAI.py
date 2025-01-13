@@ -3,24 +3,29 @@ from typing import TypedDict, Dict
 from langgraph.graph import StateGraph, END
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables.graph import MermaidDrawMethod
-from IPython.display import display, Image
 from dotenv import load_dotenv
 import os
+from langchain_groq import ChatGroq
+
+# Load environment variables
+load_dotenv()
+
+# Explicitly set API key in case it's not loaded properly
+api_key = os.getenv('GROQ_API_KEY')
+if not api_key:
+    os.environ['GROQ_API_KEY'] = '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'
+
+llm = ChatGroq(
+    temperature=0,
+    groq_api_key=os.getenv('GROQ_API_KEY'),
+    model_name="llama-3.3-70b-versatile"
+)
 
 class State(TypedDict):
     query: str
     category: str
     sentiment: str
     response: str
-
-from langchain_groq import ChatGroq
-load_dotenv()
-llm = ChatGroq(
-    temperature=0,
-    groq_api_key=os.getenv('GROQ_API_KEY') ,
-    model_name="llama-3.3-70b-versatile"
-)
-
 
 def categorize(state: State) -> State:
     """Categorize the query."""
@@ -113,7 +118,6 @@ workflow.set_entry_point("categorize")
 
 app = workflow.compile()
 
-# Create Streamlit interface
 def run_customer_support(query: str) -> Dict[str, str]:
     results = app.invoke({"query": query})
     return {
@@ -122,7 +126,6 @@ def run_customer_support(query: str) -> Dict[str, str]:
         "Response": results['response']
     }
 
-# Streamlit UI
 def streamlit_interface():
     st.title("Customer Support Assistant")
     st.write("Provide a query and receive a categorized response. The system analyzes sentiment and routes to the appropriate support channel.")
@@ -142,7 +145,6 @@ def streamlit_interface():
     # Display Mermaid Diagram for Workflow
     mermaid_code = app.get_graph().draw_mermaid()
 
-    # Ensure proper rendering by embedding the Mermaid.js renderer
     st.markdown("""
     <script type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
