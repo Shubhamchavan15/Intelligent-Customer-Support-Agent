@@ -14,7 +14,7 @@ class State(TypedDict):
     response: str
 
 from langchain_groq import ChatGroq
-
+load_dotenv()
 llm = ChatGroq(
     temperature=0,
     groq_api_key=os.getenv('GROQ_API_KEY') ,
